@@ -49,6 +49,11 @@ const (
       MINIKUBE_IP = "192.168.99.100"
 )
 
+// define a list var and add an init function
+var (
+	id_list = []string{}
+)
+
 func NewHandler() sdk.Handler {
 	return &Handler{}
 }
@@ -61,6 +66,22 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *v1.Postgres:
 		foo := o
+
+		fmt.Println("The uid is: " + foo.ResourceVersion)
+
+		for counter := 0; counter < len(id_list); counter++ {
+			fmt.Println("This element: " + id_list[counter])
+		}
+
+		for counter := 0; counter < len(id_list); counter++ {
+			if id_list[counter] == foo.ResourceVersion {
+				fmt.Println("I already found this id lol")
+				return nil
+			}
+		}
+
+		id_list = append(id_list, foo.ResourceVersion)
+
 		deploymentName := foo.Spec.DeploymentName
 
 		if deploymentName == "" {
